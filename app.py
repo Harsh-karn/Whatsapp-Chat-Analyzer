@@ -11,14 +11,18 @@ uploaded_file = st.sidebar.file_uploader("Choose a file")
 if uploaded_file is not None:
     # st.sidebar.balloons()
     bytes_data = uploaded_file.getvalue()
-    data = bytes_data.decode("utf-8")
+    try:
+        data = bytes_data.decode("utf-8")
+    except UnicodeDecodeError:
+        data = bytes_data.decode("utf-8", errors="replace")
     # st.text(data)
     df = preprocessor.preprocess(data)
     st.dataframe(df)
 
     # fetch unique users
     user_list = df['user'].unique().tolist()
-    user_list.remove('group_notification')
+    if 'group_notification' in user_list:
+        user_list.remove('group_notification')
     user_list.sort()
     user_list.insert(0,"Overall")
 
@@ -71,8 +75,9 @@ if uploaded_file is not None:
 
             fig,ax = plt.subplots()
 
-            ax.barh(most_common_df[0],most_common_df[1], color="black")
-            plt.xticks(rotation='vertical')
+            if not most_common_df.empty:
+                ax.barh(most_common_df[0],most_common_df[1], color="black")
+                plt.xticks(rotation='vertical')
 
             st.title('Most common words')
             st.pyplot(fig)
@@ -89,8 +94,9 @@ if uploaded_file is not None:
                 st.dataframe(emoji_df)
             with col2:
                 fig,ax = plt.subplots()
-                ax.pie(emoji_df[1].head(10),labels=emoji_df[0].head(10),autopct="%0.2f")
-                st.pyplot(fig, color="black")
+                if not emoji_df.empty:
+                    ax.pie(emoji_df[1].head(10),labels=emoji_df[0].head(10),autopct="%0.2f")
+                st.pyplot(fig)
 
 
              # monthly timeline
@@ -132,6 +138,7 @@ if uploaded_file is not None:
         st.title("Weekly Activity Map")
         user_heatmap = helper.activity_heatmap(selected_user,df)
         fig,ax = plt.subplots()
-        ax = sns.heatmap(user_heatmap)
+        if not user_heatmap.empty:
+            ax = sns.heatmap(user_heatmap)
         st.pyplot(fig)
         st.subheader("Thankyou for Using this project")

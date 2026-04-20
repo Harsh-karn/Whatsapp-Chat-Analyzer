@@ -2,14 +2,37 @@ import re
 import pandas as pd 
 
 def preprocess(data):
-    pattern = '\d{1,2}/\d{1,2}/\d{2,4},\s\d{1,2}:\d{2}\s-\s'
+    # Universal regex pattern for various WhatsApp export formats
+    pattern = r'\d{1,2}[\/\-\.]\d{1,2}[\/\-\.]\d{2,4},\s\d{1,2}:\d{2}(?::\d{2})?\s*(?:[aApP]\.?[mM]\.?)?\s*-\s|\[\d{1,2}[\/\-\.]\d{1,2}[\/\-\.]\d{2,4},\s\d{1,2}:\d{2}(?::\d{2})?\s*(?:[aApP]\.?[mM]\.?)?\]\s'
 
     messages = re.split(pattern, data)[1:]
     dates = re.findall(pattern, data)
 
     df = pd.DataFrame({'user_message': messages, 'message_date': dates})
-    # convert message_date type
-    df['message_date'] = pd.to_datetime(df['message_date'], format='%d/%m/%Y, %H:%M - ')
+    
+    if df.empty:
+        df['date'] = pd.to_datetime([])
+        df['user'] = []
+        df['message'] = []
+        df['only_date'] = []
+        df['year'] = []
+        df['month_num'] = []
+        df['month'] = []
+        df['day'] = []
+        df['day_name'] = []
+        df['hour'] = []
+        df['minute'] = []
+        df['period'] = []
+        return df
+
+    # Clean the extracted dates to parse them
+    df['message_date'] = df['message_date'].astype(str)
+    df['message_date'] = df['message_date'].str.replace(r'\s*-\s*$', '', regex=True)
+    df['message_date'] = df['message_date'].str.replace(r'\[', '', regex=True)
+    df['message_date'] = df['message_date'].str.replace(r'\]\s*$', '', regex=True)
+    
+    # convert message_date type using flexible parsing
+    df['message_date'] = pd.to_datetime(df['message_date'], format='mixed', dayfirst=True)
 
     df.rename(columns={'message_date': 'date'}, inplace=True)
 

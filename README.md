@@ -1,6 +1,6 @@
 # Whatsapp-chat-analyzer
 
-[![Python package](https://github.com/0904-mansi/Whatsapp-chat-analyzer/actions/workflows/python-package.yml/badge.svg)](https://github.com/0904-mansi/Whatsapp-chat-analyzer/actions/workflows/python-package.yml)
+[![Python package](https://github.com/Harsh-karn/Whatsapp-Chat-Analyzer/actions/workflows/python-package.yml/badge.svg)](https://github.com/Harsh-karn/Whatsapp-Chat-Analyzer/actions/workflows/python-package.yml)
 
 <img width="1673" alt="image" src="https://user-images.githubusercontent.com/81081105/232328220-920c0ced-febb-4aa0-abd6-7806ca7f8219.png">
 
